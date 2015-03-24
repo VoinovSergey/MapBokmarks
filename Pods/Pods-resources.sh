@@ -41,6 +41,10 @@ install_resource()
       ;;
   esac
 }
+install_resource "SAMHUDView/Resources/SAMHUDView-Check.png"
+install_resource "SAMHUDView/Resources/SAMHUDView-Check@2x.png"
+install_resource "SAMHUDView/Resources/SAMHUDView-X.png"
+install_resource "SAMHUDView/Resources/SAMHUDView-X@2x.png"
 
 rsync -avr --copy-links --no-relative --exclude '*/.svn/*' --files-from="$RESOURCES_TO_COPY" / "${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}"
 if [[ "${ACTION}" == "install" ]]; then

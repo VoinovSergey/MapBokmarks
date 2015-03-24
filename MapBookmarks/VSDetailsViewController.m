@@ -16,13 +16,17 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    [self retriveLocationDescriptionForCoordinate:((CLLocation *)self.bookmark.coordinates).coordinate]; //self.bookmark.coordinates
+    if (self.bookmark.named) {
+        self.tableView.separatorColor = [UIColor clearColor];
+    } else {
+        [self retriveLocationDescriptionForCoordinate:((CLLocation *)self.bookmark.coordinates).coordinate];
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     self.bookmark.named = YES;
     self.bookmark.title = self.placeArray[indexPath.row];
+    self.tableView.separatorColor = [UIColor clearColor];
     [self.tableView reloadData];
 }
 
@@ -52,7 +56,7 @@
         [showPlacesButton addTarget:self action:@selector(makeUnnamedAndShowPlaces) forControlEvents:UIControlEventTouchUpInside];
         [showPlacesButton setTitle:@"Load nearby places" forState:UIControlStateNormal];
         [headerView addSubview:showPlacesButton];
-        showPlacesButton.frame = CGRectMake(300, 20, 200, 40);
+        showPlacesButton.frame = CGRectMake(300, 10, 200, 40);
     }
     return headerView;
 }
@@ -77,6 +81,7 @@
 
 - (void)makeUnnamedAndShowPlaces {
     self.bookmark.named = NO;
+    self.tableView.separatorColor = [UIColor lightGrayColor];
     [self retriveLocationDescriptionForCoordinate:((CLLocation *)self.bookmark.coordinates).coordinate];
 }
 

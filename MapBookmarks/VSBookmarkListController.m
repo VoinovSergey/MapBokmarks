@@ -32,6 +32,8 @@
     
     [fetchRequest setFetchBatchSize:20];
     
+    [NSFetchedResultsController deleteCacheWithName:@"Root"];
+    
     NSFetchedResultsController *theFetchedResultsController =
     [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
                                         managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil
@@ -79,8 +81,22 @@
     
     return cell;
 }
+
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     return YES;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.presentingViewController != nil) {
+        NSLog(@"Press cell");
+        [self dismissViewControllerAnimated:YES completion:^{
+            if (self.selectionCellBlock != nil) {
+                VSBookmark * bookmark = [self.fetchedResultsController objectAtIndexPath:indexPath];
+                self.selectionCellBlock(bookmark);
+            }
+        }];
+        
+    }
 }
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {

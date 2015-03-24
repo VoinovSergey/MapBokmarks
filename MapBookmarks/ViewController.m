@@ -13,6 +13,7 @@
 #import "VSBookmark.h"
 #import "AppDelegate.h"
 #import "VSDetailsViewController.h"
+#import "VSBookmarkListController.h"
 
 @interface ViewController ()
 
@@ -46,18 +47,12 @@
 {
     self.mapView.centerCoordinate = userLocation.location.coordinate;
     
-    MKMapPoint * pointsArray = malloc(sizeof(CLLocationCoordinate2D)*2);
-    pointsArray[0] = MKMapPointForCoordinate(userLocation.location.coordinate);
-    pointsArray[1] = MKMapPointForCoordinate(CLLocationCoordinate2DMake(0.03, 0.04));
-    
-    MKPolyline *  routeLine = [MKPolyline polylineWithPoints:pointsArray count:2];
-    
-    [self.mapView addOverlay:routeLine];
+    [self updateMapAnnotations];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-    [self updateMapView:locations[0]];
+    
 }
 
 - (void)setupGestureRecognaizer
@@ -92,25 +87,25 @@
     NSManagedObject *newBookmark = [NSEntityDescription
                                     insertNewObjectForEntityForName:@"VSBookmark"
                                     inManagedObjectContext:context];
-    
     ((VSBookmark *)newBookmark).coordinates = location;
     ((VSBookmark *)newBookmark).named = NO;
     ((VSBookmark *)newBookmark).title = @"Unnamed";
-    [context save:nil];
     
-    [self updateMapAnnotations];
     [self.mapView setRegion:region animated:YES];
     [self.mapView regionThatFits:region];
 }
 
 - (void)updateMapAnnotations {
-    NSArray * bookmarks = [[_fetchedResultsController sections] objectAtIndex:0];
-    NSArray * annotations = [self generateAnnotationsFromBookmarks:bookmarks];
+    [self.fetchedResultsController performFetch:nil];
+    NSLog(@"self.fetchedResultsController %@\n ", [self.fetchedResultsController sections]);
+    NSObject<NSFetchedResultsSectionInfo> * bookmarks = [[self.fetchedResultsController sections] objectAtIndex:0];
+    NSArray * annotations = [self generateAnnotationsFromBookmarks:bookmarks.objects];
     [self.mapView removeAnnotations:self.mapView.annotations];
     [self.mapView addAnnotations:annotations];
 }
 
 - (void)addAnnotationForBookmark:(VSBookmark *)bookmark {
+    [self.managedObjectContext save:nil];
     TTMapAnnotation * annotation = [[TTMapAnnotation alloc] initWithCoordinate:((CLLocation *)bookmark.coordinates).coordinate andBookmarkID:bookmark.objectID];
     annotation.title = ((VSBookmark *)bookmark).title;
     
@@ -120,7 +115,7 @@
 - (void)removeAnnotationForBookmark:(VSBookmark *)bookmark {
     TTMapAnnotation * foundAnnotation = nil;
     for (TTMapAnnotation * annotation in self.mapView.annotations) {
-        if (annotation.bookmarkID == bookmark.objectID) {
+        if (![annotation isMemberOfClass:[MKUserLocation class]] && annotation.bookmarkID == bookmark.objectID) {
             foundAnnotation = annotation;
             break;
         }
@@ -174,9 +169,11 @@
     }
     TTMapAnnotation * annotation = ((MKAnnotationView *)parentView).annotation;
     NSManagedObjectID * bookmarkID = annotation.bookmarkID;
-    NSManagedObjectContext * context = [((AppDelegate *)[[UIApplication sharedApplication] delegate]) managedObjectContext];
-    VSBookmark * bookmark = (VSBookmark *)[context existingObjectWithID:bookmarkID
+    VSBookmark * bookmark = (VSBookmark *)[self.managedObjectContext existingObjectWithID:bookmarkID
                                                     error:nil];
+    
+    NSLog(@"Location to bookmarks saved = %@\n Bookmark ID = %@", bookmark.coordinates, bookmarkID);
+    
     [self openDetailsScreen:bookmark];
 }
 
@@ -210,8 +207,10 @@
 }
 
 - (void)openDetailsScreen:(VSBookmark *)bookmark {
+    [self.managedObjectContext save:nil];
     
     self.selectedBookmark = (VSBookmark *)bookmark;
+    
     [self performSegueWithIdentifier:@"OpenDetailsSegueIdentifier" sender:self];
 }
 
@@ -221,6 +220,11 @@
         ViewController * mainScreenController = (ViewController *)sender;
         VSDetailsViewController *vc = [segue destinationViewController];
         vc.bookmark = mainScreenController.selectedBookmark;
+    } else if ([ [[segue destinationViewController] class] isSubclassOfClass:[VSBookmarkListController class]]) {
+        NSLog(@"list open\n");
+        ((VSBookmarkListController *)[segue destinationViewController]).selectionCellBlock = ^(VSBookmark * bookmark){
+            [self goToRouteModeWithBookmark:bookmark];
+        };
     }
 }
 
@@ -304,6 +308,24 @@
 
 - (void)reloadAnnotations {
     
+}
+
+- (void)goToRouteModeWithBookmark:(VSBookmark *)bookmark {
+    self.routingMode = YES;
+    self.routeButton.style = UIBarButtonSystemItemAction;
+    MKMapPoint * pointsArray = malloc(sizeof(CLLocationCoordinate2D)*2);
+    pointsArray[0] = MKMapPointForCoordinate(self.mapView.userLocation.location.coordinate);
+    pointsArray[1] = MKMapPointForCoordinate(((CLLocation *)bookmark.coordinates).coordinate);
+    
+    MKPolyline *  routeLine = [MKPolyline polylineWithPoints:pointsArray count:2];
+    
+    [self.mapView addOverlay:routeLine];
+}
+
+- (IBAction)tapOnRouteButton:(id)sender {
+    if (self.routingMode) {
+        self.routeButton
+    }
 }
 
 @end
