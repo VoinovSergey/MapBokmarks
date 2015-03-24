@@ -23,6 +23,7 @@
 @property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
 
 @property (nonatomic, assign) BOOL routingMode;
+@property (nonatomic, strong) MKPolyline * route;
 
 - (IBAction)tapOnRouteButton:(id)sender;
 

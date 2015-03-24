@@ -28,9 +28,7 @@
                     <navigationItem key="navigationItem" title="Main Screen" id="92N-2m-34b">
                         <barButtonItem key="leftBarButtonItem" title="Route" id="8bJ-bU-w6u">
                             <connections>
-                                <segue destination="256-jj-Zsp" kind="popoverPresentation" popoverAnchorBarButtonItem="8bJ-bU-w6u" id="pKi-ys-6In">
-                                    <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
-                                </segue>
+                                <action selector="tapOnRouteButton:" destination="BYZ-38-t0r" id="wCL-IU-3w9"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Bookmarks" id="nj0-Xh-CFY">
@@ -44,7 +42,11 @@
                     <size key="freeformSize" width="768" height="1024"/>
                     <connections>
                         <outlet property="mapView" destination="Skd-0M-hQX" id="ral-9i-L1Q"/>
+                        <outlet property="routeButton" destination="8bJ-bU-w6u" id="tCc-so-Cuw"/>
                         <segue destination="wGM-tf-ZTk" kind="show" identifier="OpenDetailsSegueIdentifier" id="Ucs-8j-pSm"/>
+                        <segue destination="256-jj-Zsp" kind="popoverPresentation" identifier="bookmarkListSegueIdentifier" popoverAnchorBarButtonItem="8bJ-bU-w6u" id="8Z9-9H-FYy">
+                            <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                        </segue>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

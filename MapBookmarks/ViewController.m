@@ -14,6 +14,7 @@
 #import "AppDelegate.h"
 #import "VSDetailsViewController.h"
 #import "VSBookmarkListController.h"
+#import "RegexKitLite.h"
 
 @interface ViewController ()
 
@@ -216,11 +217,11 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue
                  sender:(id)sender {
-    if ([[sender class] isSubclassOfClass:[ViewController class]]) {
+    if ([[segue.destinationViewController class] isSubclassOfClass:[VSDetailsViewController class]]) {
         ViewController * mainScreenController = (ViewController *)sender;
         VSDetailsViewController *vc = [segue destinationViewController];
         vc.bookmark = mainScreenController.selectedBookmark;
-    } else if ([ [[segue destinationViewController] class] isSubclassOfClass:[VSBookmarkListController class]]) {
+    } else if ([[[segue destinationViewController] class] isSubclassOfClass:[VSBookmarkListController class]] && [segue.identifier isEqualToString:@"bookmarkListSegueIdentifier"]) {
         NSLog(@"list open\n");
         ((VSBookmarkListController *)[segue destinationViewController]).selectionCellBlock = ^(VSBookmark * bookmark){
             [self goToRouteModeWithBookmark:bookmark];
@@ -236,7 +237,7 @@
     MKPolylineView  * _routeLineView = [[MKPolylineView alloc] initWithPolyline:overlay];
     _routeLineView.fillColor = [UIColor whiteColor];
     _routeLineView.strokeColor = [UIColor blueColor];
-    _routeLineView.lineWidth = 15;
+    _routeLineView.lineWidth = 4;
     _routeLineView.lineCap = kCGLineCapSquare;
     
     
@@ -312,20 +313,114 @@
 
 - (void)goToRouteModeWithBookmark:(VSBookmark *)bookmark {
     self.routingMode = YES;
-    self.routeButton.style = UIBarButtonSystemItemAction;
-    MKMapPoint * pointsArray = malloc(sizeof(CLLocationCoordinate2D)*2);
-    pointsArray[0] = MKMapPointForCoordinate(self.mapView.userLocation.location.coordinate);
-    pointsArray[1] = MKMapPointForCoordinate(((CLLocation *)bookmark.coordinates).coordinate);
+    [self.routeButton setTitle:@"Clear route"];
     
-    MKPolyline *  routeLine = [MKPolyline polylineWithPoints:pointsArray count:2];
+    NSArray *routes = [self calculateRoutesFrom:self.mapView.userLocation.location.coordinate to:((CLLocation *)bookmark.coordinates).coordinate];
+    NSInteger numberOfSteps = routes.count;
     
-    [self.mapView addOverlay:routeLine];
+    CLLocationCoordinate2D coordinates[numberOfSteps];
+    for (NSInteger index = 0; index < numberOfSteps; index++)
+    {
+        CLLocation *location = [routes objectAtIndex:index];
+        CLLocationCoordinate2D coordinate = location.coordinate;
+        coordinates[index] = coordinate;
+    }
+    MKPolyline *polyLine = [MKPolyline polylineWithCoordinates:coordinates count:numberOfSteps];
+    self.route = polyLine;
+    [self.mapView addOverlay:polyLine];
+    
+    MKCoordinateRegion region;
+    CLLocationDegrees maxLat = -90.0;
+    CLLocationDegrees maxLon = -180.0;
+    CLLocationDegrees minLat = 90.0;
+    CLLocationDegrees minLon = 180.0;
+    for(int idx = 0; idx < routes.count; idx++)
+    {
+        CLLocation* currentLocation = [routes objectAtIndex:idx];
+        if(currentLocation.coordinate.latitude > maxLat)
+            maxLat = currentLocation.coordinate.latitude;
+        if(currentLocation.coordinate.latitude < minLat)
+            minLat = currentLocation.coordinate.latitude;
+        if(currentLocation.coordinate.longitude > maxLon)
+            maxLon = currentLocation.coordinate.longitude;
+        if(currentLocation.coordinate.longitude < minLon)
+            minLon = currentLocation.coordinate.longitude;
+    }
+    region.center.latitude     = (maxLat + minLat) / 2.0;
+    region.center.longitude    = (maxLon + minLon) / 2.0;
+    region.span.latitudeDelta = 0.01;
+    region.span.longitudeDelta = 0.01;
+    
+    region.span.latitudeDelta  = ((maxLat - minLat)<0.0)?100.0:(maxLat - minLat);
+    region.span.longitudeDelta = ((maxLon - minLon)<0.0)?100.0:(maxLon - minLon);
+    [self.mapView setRegion:region animated:YES];
 }
 
 - (IBAction)tapOnRouteButton:(id)sender {
     if (self.routingMode) {
-        self.routeButton
+        [self.routeButton setTitle:@"Route"];
+        self.routingMode = !self.routingMode;
+        [self clearRoute];
+    } else {
+        [self performSegueWithIdentifier:@"bookmarkListSegueIdentifier" sender:self];
     }
+}
+
+- (void)clearRoute {
+    [self.mapView removeOverlay:self.route];
+}
+
+- (NSMutableArray *)decodePolyLine: (NSMutableString *)encoded
+{
+    [encoded replaceOccurrencesOfString:@"\\\\" withString:@"\\" options:NSLiteralSearch range:NSMakeRange(0, [encoded length])];
+    NSInteger len = [encoded length];
+    NSInteger index = 0;
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+    NSInteger lat=0;
+    NSInteger lng=0;
+    while (index < len)
+    {
+        NSInteger b;
+        NSInteger shift = 0;
+        NSInteger result = 0;
+        do
+        {
+            b = [encoded characterAtIndex:index++] - 63;
+            result |= (b & 0x1f) << shift;
+            shift += 5;
+        } while (b >= 0x20);
+        NSInteger dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+        lat += dlat;
+        shift = 0;
+        result = 0;
+        do
+        {
+            b = [encoded characterAtIndex:index++] - 63;
+            result |= (b & 0x1f) << shift;
+            shift += 5;
+        } while (b >= 0x20);
+        NSInteger dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
+        lng += dlng;
+        NSNumber *latitude = [[NSNumber alloc] initWithFloat:lat * 1e-5];
+        NSNumber *longitude = [[NSNumber alloc] initWithFloat:lng * 1e-5];
+        CLLocation *loc = [[CLLocation alloc] initWithLatitude:[latitude floatValue] longitude:[longitude floatValue]];
+        [array addObject:loc];
+    }
+    return array;
+}
+
+-(NSArray*) calculateRoutesFrom:(CLLocationCoordinate2D) f to: (CLLocationCoordinate2D) t
+{
+    NSString* saddr = [NSString stringWithFormat:@"%f,%f", f.latitude, f.longitude];
+    NSString* daddr = [NSString stringWithFormat:@"%f,%f", t.latitude, t.longitude];
+    
+    NSString* apiUrlStr = [NSString stringWithFormat:@"http://maps.google.com/maps?output=dragdir&saddr=%@&daddr=%@", saddr, daddr];
+    NSURL* apiUrl = [NSURL URLWithString:apiUrlStr];
+    //NSLog(@"api url: %@", apiUrl);
+    NSError* error = nil;
+    NSString *apiResponse = [NSString stringWithContentsOfURL:apiUrl encoding:NSASCIIStringEncoding error:&error];
+    NSString *encodedPoints = [apiResponse stringByMatching:@"points:\\\"([^\\\"]*)\\\"" capture:1L];
+    return [self decodePolyLine:[encodedPoints mutableCopy]];
 }
 
 @end
