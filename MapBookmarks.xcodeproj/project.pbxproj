@@ -460,7 +460,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = MapBookmarks/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(FRANK_LIBRARY_SEARCH_PATHS)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-framework",
@@ -494,6 +496,7 @@
 					"-weak_framework",
 					UIKit,
 					"-licucore",
+					"$(FRANK_LDFLAGS)",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -505,7 +508,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = MapBookmarks/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(FRANK_LIBRARY_SEARCH_PATHS)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-framework",
@@ -539,6 +544,7 @@
 					"-weak_framework",
 					UIKit,
 					"-licucore",
+					"$(FRANK_LDFLAGS)",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
