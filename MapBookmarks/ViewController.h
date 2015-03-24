@@ -9,11 +9,17 @@
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 #import <CoreLocation/CoreLocation.h>
+#import "VSBookmark.h"
 
 @interface ViewController : UIViewController<MKMapViewDelegate, CLLocationManagerDelegate>
 
-@property(nonatomic, retain) IBOutlet MKMapView * mapView;
-@property (strong, nonatomic) CLLocationManager *locationManager;
+@property (nonatomic, strong) IBOutlet MKMapView * mapView;
+@property (nonatomic, strong) CLLocationManager *locationManager;
+
+@property (nonatomic, strong) VSBookmark * selectedBookmark;
+
+@property (nonatomic,strong) NSManagedObjectContext* managedObjectContext;
+@property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
 
 @end
 

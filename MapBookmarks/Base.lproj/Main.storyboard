@@ -44,11 +44,12 @@
                     <size key="freeformSize" width="768" height="1024"/>
                     <connections>
                         <outlet property="mapView" destination="Skd-0M-hQX" id="ral-9i-L1Q"/>
+                        <segue destination="wGM-tf-ZTk" kind="show" identifier="OpenDetailsSegueIdentifier" id="Ucs-8j-pSm"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="872" y="1166"/>
+            <point key="canvasLocation" x="902" y="1212"/>
         </scene>
         <!--Table View Controller-->
         <scene sceneID="3oF-Cv-vXg">
@@ -76,16 +77,50 @@
             </objects>
             <point key="canvasLocation" x="10" y="959"/>
         </scene>
-        <!--Table View Controller-->
+        <!--Details View Controller-->
+        <scene sceneID="Kad-0T-JLV">
+            <objects>
+                <tableViewController id="wGM-tf-ZTk" customClass="VSDetailsViewController" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="129" sectionHeaderHeight="22" sectionFooterHeight="22" id="BcJ-LE-xXO">
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="tef-Qf-muF" rowHeight="129" style="IBUITableViewCellStyleDefault" id="1PY-YX-XUK">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="1PY-YX-XUK" id="wxW-Ad-9AC">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="tef-Qf-muF">
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="wGM-tf-ZTk" id="5nC-Pr-zad"/>
+                            <outlet property="delegate" destination="wGM-tf-ZTk" id="cfy-2h-mrD"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="tXb-5v-HJu" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-222" y="2022"/>
+        </scene>
+        <!--Bookmark List Controller-->
         <scene sceneID="dWe-EW-F9X">
             <objects>
-                <tableViewController id="Svv-RX-7hE" sceneMemberID="viewController">
+                <tableViewController id="Svv-RX-7hE" customClass="VSBookmarkListController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="7Bt-Gf-PGL">
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="kCy-fs-4OR">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" id="kCy-fs-4OR">
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="kCy-fs-4OR" id="VLz-1e-LY3">
                                     <autoresizingMask key="autoresizingMask"/>
@@ -97,9 +132,18 @@
                             <outlet property="delegate" destination="Svv-RX-7hE" id="MOT-5i-W3f"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="FfE-9o-rxI"/>
+                    <navigationItem key="navigationItem" id="FfE-9o-rxI">
+                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="zvC-w3-rzY">
+                            <connections>
+                                <action selector="toogleEditMode:" destination="Svv-RX-7hE" id="i6b-22-5BG"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="768" height="1024"/>
+                    <connections>
+                        <outlet property="editButton" destination="zvC-w3-rzY" id="JSJ-dz-bq8"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wtS-Le-ebc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
