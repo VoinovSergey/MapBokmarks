@@ -54,7 +54,7 @@
         exit(-1);  // Fail
     }
     
-    self.title = @"Bookmaarks";
+    self.title = @"Bookmarks";
 }
 
 - (NSInteger)tableView:(UITableView *)tableView
@@ -88,11 +88,11 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.presentingViewController != nil) {
-        NSLog(@"Press cell");
+        DECLARE_WEAK_SELF;
         [self dismissViewControllerAnimated:YES completion:^{
-            if (self.selectionCellBlock != nil) {
+            if (weak_self.selectionCellBlock != nil) {
                 VSBookmark * bookmark = [self.fetchedResultsController objectAtIndexPath:indexPath];
-                self.selectionCellBlock(bookmark);
+                weak_self.selectionCellBlock(bookmark);
             }
         }];
         

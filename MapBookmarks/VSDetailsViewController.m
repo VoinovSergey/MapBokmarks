@@ -150,8 +150,7 @@
 
 - (void)retriveLocationDescriptionForCoordinate:(CLLocationCoordinate2D)coordinate
 {
-    if (self.progressIndicator == nil)
-    {
+    if (self.progressIndicator == nil) {
         self.progressIndicator = [[SAMHUDView alloc] initWithTitle:@"Loading" loading:YES];
     }
     
@@ -163,6 +162,7 @@
     NSString *urlString = [NSString stringWithFormat:@"http://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f&sensor=true", coordinate.latitude, coordinate.longitude];
     
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    DECLARE_WEAK_SELF;
     [manager GET:urlString parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         //NSLog(@"JSON: %@, %@", responseObject, [responseObject class]);
         NSMutableArray * placeArray = [[NSMutableArray alloc] initWithCapacity:5];
@@ -175,12 +175,12 @@
                 }
             }
         }
-        [self.progressIndicator removeFromSuperview];
-        self.placeArray = placeArray;
-        [self.tableView reloadData];
+        [weak_self.progressIndicator removeFromSuperview];
+        weak_self.placeArray = placeArray;
+        [weak_self.tableView reloadData];
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         NSLog(@"Error: %@", error);
-        [self.progressIndicator removeFromSuperview];
+        [weak_self.progressIndicator removeFromSuperview];
     }];
 }
 

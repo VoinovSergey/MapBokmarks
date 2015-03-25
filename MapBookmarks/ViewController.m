@@ -229,8 +229,9 @@
         vc.bookmark = mainScreenController.selectedBookmark;
         vc.delegate = self;
     } else if ([[[segue destinationViewController] class] isSubclassOfClass:[VSBookmarkListController class]] && [segue.identifier isEqualToString:@"bookmarkListSegueIdentifier"]) {
+        DECLARE_WEAK_SELF;
         ((VSBookmarkListController *)[segue destinationViewController]).selectionCellBlock = ^(VSBookmark * bookmark){
-            [self goToRouteModeWithBookmark:bookmark];
+            [weak_self goToRouteModeWithBookmark:bookmark];
         };
     }
 }
