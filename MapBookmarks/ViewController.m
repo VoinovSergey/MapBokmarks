@@ -34,7 +34,6 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    //self.popoverPresentationController
 }
 
 - (void)didReceiveMemoryWarning {
@@ -51,7 +50,7 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-    
+    // TODO: update route in routing mode
 }
 
 - (void)setupGestureRecognaizer
@@ -149,9 +148,7 @@
 
 - (MKAnnotationView *) mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation
 {
-    //[self setupGestureRecognaizer];
     if ([annotation isMemberOfClass:[MKUserLocation class]]) {
-        
         return nil;
     }
     MKPinAnnotationView *annotationView = (MKPinAnnotationView *)[self.mapView dequeueReusableAnnotationViewWithIdentifier:@"currentlocation"];
@@ -172,10 +169,9 @@
 }
 
 - (void)tapOnDisclosureButton:(id)sender {
-    NSLog(@"%@", sender);
     UIButton * button = (UIButton *)sender;
-    NSLog(@" %@", button.titleLabel.text);
     UIView * parentView = button;
+    // Find AnnotationView - parent of disclosure button
     while (! [[parentView class] isSubclassOfClass:[MKAnnotationView class]]) {
         parentView = [parentView superview];
     }
@@ -183,8 +179,6 @@
     NSManagedObjectID * bookmarkID = annotation.bookmarkID;
     VSBookmark * bookmark = (VSBookmark *)[self.managedObjectContext existingObjectWithID:bookmarkID
                                                     error:nil];
-    
-    NSLog(@"Location to bookmarks saved = %@\n Bookmark ID = %@", bookmark.coordinates, bookmarkID);
     
     [self openDetailsScreen:bookmark];
 }
@@ -196,6 +190,7 @@
         CLLocationCoordinate2D coordinate = annotationView.annotation.coordinate;
         CLLocation * curLocation = [[CLLocation alloc] initWithLatitude:coordinate.latitude longitude:coordinate.longitude];
         // TODO: save new coordinate to appropriative bookmark
+        NSLog(@"%@", curLocation);
     }
 }
 
@@ -215,7 +210,7 @@
 
 - (void)mapViewDidFinishLoadingMap:(MKMapView *)mapView
 {
-    //[mapView selectAnnotation:self.annotationView animated:FALSE];
+    // TODO: Initial setup of map region
 }
 
 - (void)openDetailsScreen:(VSBookmark *)bookmark {
@@ -234,7 +229,6 @@
         vc.bookmark = mainScreenController.selectedBookmark;
         vc.delegate = self;
     } else if ([[[segue destinationViewController] class] isSubclassOfClass:[VSBookmarkListController class]] && [segue.identifier isEqualToString:@"bookmarkListSegueIdentifier"]) {
-        NSLog(@"list open\n");
         ((VSBookmarkListController *)[segue destinationViewController]).selectionCellBlock = ^(VSBookmark * bookmark){
             [self goToRouteModeWithBookmark:bookmark];
         };

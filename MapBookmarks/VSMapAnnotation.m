@@ -1,5 +1,5 @@
 //
-//  TTMapAnnotation.m
+//  VSMapAnnotation.m
 //
 
 

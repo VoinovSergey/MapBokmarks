@@ -1,5 +1,5 @@
 //
-//  TTMapAnnotation.h
+//  VSMapAnnotation.h
 //
 
 #import <Foundation/Foundation.h>
