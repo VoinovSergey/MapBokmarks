@@ -41,11 +41,18 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
-{
+- (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation {
     self.mapView.centerCoordinate = userLocation.location.coordinate;
-    
-    [self updateMapAnnotations];
+}
+
+
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
+    NSLog(@"User location error = %@", error);
+}
+
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
+    NSLog(@"Location manager updated status to %i", status);
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
@@ -208,9 +215,8 @@
     }
 }
 
-- (void)mapViewDidFinishLoadingMap:(MKMapView *)mapView
-{
-    // TODO: Initial setup of map region
+- (void)mapViewDidFinishLoadingMap:(MKMapView *)mapView {
+    [self updateMapAnnotations];
 }
 
 - (void)openDetailsScreen:(VSBookmark *)bookmark {
