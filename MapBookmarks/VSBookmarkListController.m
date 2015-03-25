@@ -136,13 +136,14 @@
 - (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id )sectionInfo atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
     
     switch(type) {
-            
         case NSFetchedResultsChangeInsert:
             [self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
             break;
             
         case NSFetchedResultsChangeDelete:
             [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+            break;
+        default:
             break;
     }
 }
@@ -155,6 +156,16 @@
 
 - (IBAction)toogleEditMode:(id)sender {
     self.tableView.editing = !self.tableView.editing;
+
+    const UIBarButtonSystemItem systemItem = self.tableView.editing ? UIBarButtonSystemItemDone :UIBarButtonSystemItemEdit;
+    
+    UIBarButtonItem *const newButton =
+    [[UIBarButtonItem alloc]
+     initWithBarButtonSystemItem: systemItem
+     target: self
+     action: @selector(toogleEditMode:)];
+    
+    [self.navigationItem setRightBarButtonItems: @[newButton] animated: YES];
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {

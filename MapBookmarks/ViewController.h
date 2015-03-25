@@ -11,7 +11,14 @@
 #import <CoreLocation/CoreLocation.h>
 #import "VSBookmark.h"
 
-@interface ViewController : UIViewController<MKMapViewDelegate, CLLocationManagerDelegate>
+@protocol MainScreenDelegate <NSObject>
+
+- (void)goToRouteModeWithBookmark:(VSBookmark *)bookmark;
+- (void)centerInMapBookmark:(VSBookmark *)bookmark;
+
+@end
+
+@interface ViewController : UIViewController<MKMapViewDelegate, CLLocationManagerDelegate, MainScreenDelegate, NSFetchedResultsControllerDelegate>
 
 @property (nonatomic, strong) IBOutlet MKMapView * mapView;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem * routeButton;
@@ -28,4 +35,6 @@
 - (IBAction)tapOnRouteButton:(id)sender;
 
 @end
+
+
 

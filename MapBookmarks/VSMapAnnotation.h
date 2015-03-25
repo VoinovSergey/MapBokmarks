@@ -11,7 +11,7 @@ typedef enum {
 	AnnotationCarLocation = 2
 } AnnotationType;
 
-@interface TTMapAnnotation : NSObject <MKAnnotation>
+@interface VSMapAnnotation : NSObject <MKAnnotation>
 
 @property (nonatomic, readwrite ,assign) CLLocationCoordinate2D coordinate;
 @property (nonatomic, copy) NSString *title;

@@ -13,6 +13,9 @@
 #import <MapKit/MapKit.h>
 #import "AppDelegate.h"
 
+#define ClientId @"BZXGWMJYKEG0PFMDOFYCJUFTXVGQR1NSAIZFHVVY0JQM1EVE"
+#define ClientSecret @"MC4HMGP4R44KCQLHLFJVP5EO4DVDPBJCP0IJOJ5RKWDCU51G"
+
 @implementation VSDetailsViewController
 
 - (void)viewDidLoad {
@@ -23,6 +26,8 @@
         [self retriveLocationDescriptionForCoordinate:((CLLocation *)self.bookmark.coordinates).coordinate];
     }
 }
+
+#pragma mark Table methods
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     self.bookmark.named = YES;
@@ -52,7 +57,7 @@
     UIView * headerView = nil;
     if (self.bookmark.named) {
         headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 60)];
-        headerView.backgroundColor = [UIColor lightGrayColor];
+        headerView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:0.5];
         UIButton * showPlacesButton = [UIButton buttonWithType:UIButtonTypeSystem];
         [showPlacesButton addTarget:self action:@selector(makeUnnamedAndShowPlaces) forControlEvents:UIControlEventTouchUpInside];
         [showPlacesButton setTitle:@"Load nearby places" forState:UIControlStateNormal];
@@ -68,16 +73,33 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"DetailsCellIdentifier"];
     }
     if (self.bookmark.named) {
-        cell.textLabel.text = @"Make unnamed";
+        cell.textLabel.text = @"";
     } else {
         if ([self.placeArray count] == 0) {
-            cell.textLabel.text = @"No found any places";
+            cell.textLabel.text = @"No found any places using API";
         } else {
             cell.textLabel.text = self.placeArray[indexPath.row];
-            NSLog(@"Cell %@", self.placeArray[indexPath.row]);
         }
     }
     return cell;
+}
+
+# pragma mark - Action
+
+- (IBAction)tapOnTrashButton:(id)sender {
+    [self showAlert];
+}
+
+- (IBAction)tapOnBuildRouteButton:(id)sender {
+    NSLog(@"Build route");
+    [self.delegate goToRouteModeWithBookmark:self.bookmark];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)tapOnCenterInMapButton:(id)sender {
+    NSLog(@"Center in map");
+    [self.delegate centerInMapBookmark:self.bookmark];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)makeUnnamedAndShowPlaces {
@@ -86,44 +108,7 @@
     [self retriveLocationDescriptionForCoordinate:((CLLocation *)self.bookmark.coordinates).coordinate];
 }
 
-- (void)retriveLocationDescriptionForCoordinate:(CLLocationCoordinate2D)coordinate
-{
-    if (self.progressIndicator == nil)
-    {
-        self.progressIndicator = [[SAMHUDView alloc] initWithTitle:@"Loading" loading:YES];
-    }
-    
-    [self.view addSubview:self.progressIndicator];
-    NSLog(@"%f , %f\n", coordinate.latitude, coordinate.longitude);
-    NSString *urlString = [NSString stringWithFormat:@"http://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f&sensor=true", coordinate.latitude, coordinate.longitude];
-    //NSString *urlString = [NSString stringWithFormat:@"https://graph.facebook.com/search?type=place&center=%f,%f&distance=1000", coordinate.latitude, coordinate.longitude];
-    //APICall *call = [APICall callWithURLString:urlString delegate:self];
-    //[call start];
-    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
-    [manager GET:urlString parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSLog(@"JSON: %@, %@", responseObject, [responseObject class]);
-        NSMutableArray * placeArray = [[NSMutableArray alloc] initWithCapacity:5];
-        NSArray * results = [responseObject objectForKey:@"results"];
-        if (results != nil) {
-            for (NSDictionary * place in results) {
-                NSString * formattedAddress = [place objectForKey:@"formatted_address"];
-                NSLog(@"%@ ", formattedAddress);
-                if (formattedAddress != nil) {
-                    [placeArray addObject:formattedAddress];
-                }
-            }
-        }
-        [self.progressIndicator removeFromSuperview];
-        self.placeArray = placeArray;
-        [self.tableView reloadData];
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"Error: %@", error);
-    }];
-}
-
-- (IBAction)tapOnTrashButton:(id)sender {
-    [self showAlert];
-}
+#pragma mark Remove Alert
 
 - (void)showAlert {
     UIAlertController *alertController = [UIAlertController
@@ -145,14 +130,13 @@
                                       if ([context save:&error] == NO) {
                                           // Handle Error.
                                       }
-
+                                      
                                       [self.navigationController popViewControllerAnimated:YES];
                                   }];
     UIAlertAction *cancelAction = [UIAlertAction
                                    actionWithTitle:@"Cancel"
                                    style:UIAlertActionStyleCancel
-                                   handler:^(UIAlertAction *action)
-                                   {
+                                   handler:^(UIAlertAction *action) {
                                        NSLog(@"Cancel action");
                                    }];
     
@@ -160,6 +144,44 @@
     [alertController addAction:cancelAction];
     
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+# pragma mark Get places using API
+
+- (void)retriveLocationDescriptionForCoordinate:(CLLocationCoordinate2D)coordinate
+{
+    if (self.progressIndicator == nil)
+    {
+        self.progressIndicator = [[SAMHUDView alloc] initWithTitle:@"Loading" loading:YES];
+    }
+    
+    [self.view addSubview:self.progressIndicator];
+    
+    // Following URL should work but returns 500 error code now. Foursquare Venues API problem. Used google API instead
+    //NSString *urlString = [NSString stringWithFormat:@"https://api.foursquare.com/v2/venues/search?ll=%f,%f&radius=1000&client_id=%@&client_secret=%@", coordinate.latitude, coordinate.longitude, ClientId, ClientSecret];
+    
+    NSString *urlString = [NSString stringWithFormat:@"http://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f&sensor=true", coordinate.latitude, coordinate.longitude];
+    
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    [manager GET:urlString parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        //NSLog(@"JSON: %@, %@", responseObject, [responseObject class]);
+        NSMutableArray * placeArray = [[NSMutableArray alloc] initWithCapacity:5];
+        NSArray * results = [responseObject objectForKey:@"results"];
+        if (results != nil) {
+            for (NSDictionary * place in results) {
+                NSString * formattedAddress = [place objectForKey:@"formatted_address"];
+                if (formattedAddress != nil) {
+                    [placeArray addObject:formattedAddress];
+                }
+            }
+        }
+        [self.progressIndicator removeFromSuperview];
+        self.placeArray = placeArray;
+        [self.tableView reloadData];
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"Error: %@", error);
+        [self.progressIndicator removeFromSuperview];
+    }];
 }
 
 @end

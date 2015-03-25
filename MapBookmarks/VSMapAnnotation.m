@@ -3,9 +3,9 @@
 //
 
 
-#import "TTMapAnnotation.h"
+#import "VSMapAnnotation.h"
 
-@implementation TTMapAnnotation
+@implementation VSMapAnnotation
 
 - (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate andBookmarkID:(NSManagedObjectID *)bookmarkID {
     self = [super init];

@@ -8,9 +8,7 @@
 
 #import "ViewController.h"
 #import "SAMHUDView.h"
-#import "TTMapAnnotation.h"
-#import <FacebookSDK/FacebookSDK.h>
-#import "VSBookmark.h"
+#import "VSMapAnnotation.h"
 #import "AppDelegate.h"
 #import "VSDetailsViewController.h"
 #import "VSBookmarkListController.h"
@@ -120,15 +118,15 @@
 
 - (void)addAnnotationForBookmark:(VSBookmark *)bookmark {
     [self.managedObjectContext save:nil];
-    TTMapAnnotation * annotation = [[TTMapAnnotation alloc] initWithCoordinate:((CLLocation *)bookmark.coordinates).coordinate andBookmarkID:bookmark.objectID];
+    VSMapAnnotation * annotation = [[VSMapAnnotation alloc] initWithCoordinate:((CLLocation *)bookmark.coordinates).coordinate andBookmarkID:bookmark.objectID];
     annotation.title = ((VSBookmark *)bookmark).title;
     
     [self.mapView addAnnotation:annotation];
 }
 
 - (void)removeAnnotationForBookmark:(VSBookmark *)bookmark {
-    TTMapAnnotation * foundAnnotation = nil;
-    for (TTMapAnnotation * annotation in self.mapView.annotations) {
+    VSMapAnnotation * foundAnnotation = nil;
+    for (VSMapAnnotation * annotation in self.mapView.annotations) {
         if (![annotation isMemberOfClass:[MKUserLocation class]] && annotation.bookmarkID == bookmark.objectID) {
             foundAnnotation = annotation;
             break;
@@ -142,7 +140,7 @@
 - (NSArray *)generateAnnotationsFromBookmarks:(NSArray *)bookmarks {
     NSMutableArray * annotations = [[NSMutableArray alloc] initWithCapacity:bookmarks.count];
     for (VSBookmark * bookmark in bookmarks) {
-        TTMapAnnotation * annotation = [[TTMapAnnotation alloc] initWithCoordinate:((CLLocation *)bookmark.coordinates).coordinate andBookmarkID:bookmark.objectID];
+        VSMapAnnotation * annotation = [[VSMapAnnotation alloc] initWithCoordinate:((CLLocation *)bookmark.coordinates).coordinate andBookmarkID:bookmark.objectID];
         annotation.title = ((VSBookmark *)bookmark).title;
         [annotations addObject:annotation];
     }
@@ -181,7 +179,7 @@
     while (! [[parentView class] isSubclassOfClass:[MKAnnotationView class]]) {
         parentView = [parentView superview];
     }
-    TTMapAnnotation * annotation = ((MKAnnotationView *)parentView).annotation;
+    VSMapAnnotation * annotation = ((MKAnnotationView *)parentView).annotation;
     NSManagedObjectID * bookmarkID = annotation.bookmarkID;
     VSBookmark * bookmark = (VSBookmark *)[self.managedObjectContext existingObjectWithID:bookmarkID
                                                     error:nil];
@@ -197,7 +195,7 @@
     {
         CLLocationCoordinate2D coordinate = annotationView.annotation.coordinate;
         CLLocation * curLocation = [[CLLocation alloc] initWithLatitude:coordinate.latitude longitude:coordinate.longitude];
-        //[self retriveLocationDescriptionForCoordinate:curLocation.coordinate];
+        // TODO: save new coordinate to appropriative bookmark
     }
 }
 
@@ -234,6 +232,7 @@
         ViewController * mainScreenController = (ViewController *)sender;
         VSDetailsViewController *vc = [segue destinationViewController];
         vc.bookmark = mainScreenController.selectedBookmark;
+        vc.delegate = self;
     } else if ([[[segue destinationViewController] class] isSubclassOfClass:[VSBookmarkListController class]] && [segue.identifier isEqualToString:@"bookmarkListSegueIdentifier"]) {
         NSLog(@"list open\n");
         ((VSBookmarkListController *)[segue destinationViewController]).selectionCellBlock = ^(VSBookmark * bookmark){
@@ -324,8 +323,19 @@
     // The fetch controller has sent all current change notifications, so tell the table view to process all updates.
 }
 
-- (void)reloadAnnotations {
+- (void)centerInMapBookmark:(VSBookmark *)bookmark {
+    MKCoordinateRegion region;
+    MKCoordinateSpan span;
+    span.latitudeDelta = 0.01f;
+    span.longitudeDelta = 0.01f;
     
+    CLLocationCoordinate2D coordinate = ((CLLocation *)bookmark.coordinates).coordinate;
+    
+    region.span = span;
+    region.center = coordinate;
+    
+    [self.mapView setRegion:region animated:YES];
+    [self.mapView regionThatFits:region];
 }
 
 - (void)goToRouteModeWithBookmark:(VSBookmark *)bookmark {
@@ -364,13 +374,13 @@
         if(currentLocation.coordinate.longitude < minLon)
             minLon = currentLocation.coordinate.longitude;
     }
-    region.center.latitude     = (maxLat + minLat) / 2.0;
-    region.center.longitude    = (maxLon + minLon) / 2.0;
+    region.center.latitude  = (maxLat + minLat) / 2.0;
+    region.center.longitude = (maxLon + minLon) / 2.0;
     region.span.latitudeDelta = 0.01;
     region.span.longitudeDelta = 0.01;
     
-    region.span.latitudeDelta  = ((maxLat - minLat)<0.0)?100.0:(maxLat - minLat);
-    region.span.longitudeDelta = ((maxLon - minLon)<0.0)?100.0:(maxLon - minLon);
+    region.span.latitudeDelta  = ((maxLat - minLat)<0.0) ? 100.0 : (maxLat - minLat);
+    region.span.longitudeDelta = ((maxLon - minLon)<0.0) ? 100.0 : (maxLon - minLon);
     [self.mapView setRegion:region animated:YES];
     self.fetchedResultsController = nil;
     [self updateMapAnnotations];

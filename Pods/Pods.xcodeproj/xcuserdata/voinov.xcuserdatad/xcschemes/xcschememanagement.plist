@@ -9,22 +9,7 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Pods-Bolts.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>Pods-Facebook-iOS-SDK.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>Pods-SAMHUDView.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>Pods-WYPopoverController.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -37,32 +22,17 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>26C44AF8D1E34188BF8C38C9</key>
+		<key>0DCDD9E1586840AB8D15570C</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>5BC61795327C4075A85030EF</key>
+		<key>4A188C09046C419992A751C9</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>7D7F93D341074BEAA13DB1D3</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>7E901A8C32D84EB69A7BB119</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>D2FD011A68DF4B3C9515B0BC</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>DB8F962EAE6F4C7C8DFFEEC8</key>
+		<key>82913E47A7734532A0C425A8</key>
 		<dict>
 			<key>primary</key>
 			<true/>

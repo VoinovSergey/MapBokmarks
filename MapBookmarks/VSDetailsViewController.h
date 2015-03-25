@@ -9,14 +9,18 @@
 #import <UIKit/UIKit.h>
 #import "VSBookmark.h"
 #import "SAMHUDView.h"
+#import "ViewController.h"
 
 @interface VSDetailsViewController : UITableViewController<UITableViewDataSource, UITableViewDelegate>
 
-@property (nonatomic, retain) NSArray * placeArray;
-@property (nonatomic, retain) VSBookmark * bookmark;
+@property (nonatomic, strong) NSArray * placeArray;
+@property (nonatomic, strong) VSBookmark * bookmark;
 
-@property (retain, nonatomic) SAMHUDView* progressIndicator;
+@property (nonatomic, strong) SAMHUDView* progressIndicator;
 
 - (IBAction)tapOnTrashButton:(id)sender;
+- (IBAction)tapOnBuildRouteButton:(id)sender;
+
+@property (nonatomic, assign) id<MainScreenDelegate> delegate;
 
 @end

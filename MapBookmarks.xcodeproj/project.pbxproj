@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B84751551AC03E9A00717D2D /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B84751541AC03E9A00717D2D /* MapKit.framework */; };
-		B84751701AC0B4EB00717D2D /* TTMapAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = B847516F1AC0B4EB00717D2D /* TTMapAnnotation.m */; };
+		B84751701AC0B4EB00717D2D /* VSMapAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = B847516F1AC0B4EB00717D2D /* VSMapAnnotation.m */; };
 		B84751731AC16C6000717D2D /* VSBookmark.m in Sources */ = {isa = PBXBuildFile; fileRef = B84751721AC16C6000717D2D /* VSBookmark.m */; };
 		B84751761AC172BA00717D2D /* VSDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B84751751AC172BA00717D2D /* VSDetailsViewController.m */; };
 		B84751791AC19EA700717D2D /* VSBookmarkListController.m in Sources */ = {isa = PBXBuildFile; fileRef = B84751781AC19EA700717D2D /* VSBookmarkListController.m */; };
@@ -38,8 +38,8 @@
 		5E211950790B445899F55AC1 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A8073A0AACF4A3885C91774 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 		B84751541AC03E9A00717D2D /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
-		B847516E1AC0B4EB00717D2D /* TTMapAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTMapAnnotation.h; sourceTree = "<group>"; };
-		B847516F1AC0B4EB00717D2D /* TTMapAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTMapAnnotation.m; sourceTree = "<group>"; };
+		B847516E1AC0B4EB00717D2D /* VSMapAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VSMapAnnotation.h; sourceTree = "<group>"; };
+		B847516F1AC0B4EB00717D2D /* VSMapAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VSMapAnnotation.m; sourceTree = "<group>"; };
 		B84751711AC16C6000717D2D /* VSBookmark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VSBookmark.h; sourceTree = "<group>"; };
 		B84751721AC16C6000717D2D /* VSBookmark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VSBookmark.m; sourceTree = "<group>"; };
 		B84751741AC172BA00717D2D /* VSDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VSDetailsViewController.h; sourceTree = "<group>"; };
@@ -118,8 +118,8 @@
 			children = (
 				B878E4AE1AC2177900F26927 /* RegexKitLite.h */,
 				B878E4AF1AC2177900F26927 /* RegexKitLite.m */,
-				B847516E1AC0B4EB00717D2D /* TTMapAnnotation.h */,
-				B847516F1AC0B4EB00717D2D /* TTMapAnnotation.m */,
+				B847516E1AC0B4EB00717D2D /* VSMapAnnotation.h */,
+				B847516F1AC0B4EB00717D2D /* VSMapAnnotation.m */,
 				B873A2BC1AC02E530083CDC4 /* AppDelegate.h */,
 				B873A2BD1AC02E530083CDC4 /* AppDelegate.m */,
 				B873A2C21AC02E530083CDC4 /* ViewController.h */,
@@ -306,7 +306,7 @@
 				B873A2BE1AC02E530083CDC4 /* AppDelegate.m in Sources */,
 				B873A2BB1AC02E530083CDC4 /* main.m in Sources */,
 				B84751791AC19EA700717D2D /* VSBookmarkListController.m in Sources */,
-				B84751701AC0B4EB00717D2D /* TTMapAnnotation.m in Sources */,
+				B84751701AC0B4EB00717D2D /* VSMapAnnotation.m in Sources */,
 				B873A2C41AC02E530083CDC4 /* ViewController.m in Sources */,
 				B873A2C11AC02E530083CDC4 /* MapBookmarks.xcdatamodeld in Sources */,
 			);
