@@ -87,7 +87,7 @@
             </objects>
             <point key="canvasLocation" x="10" y="959"/>
         </scene>
-        <!--Details View Controller-->
+        <!--Details-->
         <scene sceneID="Kad-0T-JLV">
             <objects>
                 <tableViewController id="wGM-tf-ZTk" customClass="VSDetailsViewController" sceneMemberID="viewController">
@@ -116,6 +116,14 @@
                             <outlet property="delegate" destination="wGM-tf-ZTk" id="cfy-2h-mrD"/>
                         </connections>
                     </tableView>
+                    <navigationItem key="navigationItem" title="Details" id="SDx-ux-f94">
+                        <barButtonItem key="backBarButtonItem" title="Back" id="Fvc-FV-yNK"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="trash" id="iLn-jt-35B">
+                            <connections>
+                                <action selector="tapOnTrashButton:" destination="wGM-tf-ZTk" id="6AI-qD-voF"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tXb-5v-HJu" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

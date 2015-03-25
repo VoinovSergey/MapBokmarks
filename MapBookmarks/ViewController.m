@@ -98,11 +98,24 @@
 
 - (void)updateMapAnnotations {
     [self.fetchedResultsController performFetch:nil];
-    NSLog(@"self.fetchedResultsController %@\n ", [self.fetchedResultsController sections]);
+
     NSObject<NSFetchedResultsSectionInfo> * bookmarks = [[self.fetchedResultsController sections] objectAtIndex:0];
     NSArray * annotations = [self generateAnnotationsFromBookmarks:bookmarks.objects];
     [self.mapView removeAnnotations:self.mapView.annotations];
     [self.mapView addAnnotations:annotations];
+    
+    MKCoordinateRegion region;
+    MKCoordinateSpan span;
+    span.latitudeDelta = 0.1f;
+    span.longitudeDelta = 0.1f;
+    
+    CLLocationCoordinate2D coordinate = self.mapView.userLocation.coordinate;
+    
+    region.span = span;
+    region.center = coordinate;
+    
+    [self.mapView setRegion:region animated:YES];
+    [self.mapView regionThatFits:region];
 }
 
 - (void)addAnnotationForBookmark:(VSBookmark *)bookmark {
@@ -265,7 +278,11 @@
     [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sort]];
     
     [fetchRequest setFetchBatchSize:20];
-    
+    if (self.routingMode) {
+        VSBookmark * bookmark = self.selectedBookmark;
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"self == %@", bookmark]];
+    }
+    [NSFetchedResultsController deleteCacheWithName:@"Root"];
     NSFetchedResultsController *theFetchedResultsController =
     [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
                                         managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil
@@ -314,6 +331,7 @@
 - (void)goToRouteModeWithBookmark:(VSBookmark *)bookmark {
     self.routingMode = YES;
     [self.routeButton setTitle:@"Clear route"];
+    self.selectedBookmark = bookmark;
     
     NSArray *routes = [self calculateRoutesFrom:self.mapView.userLocation.location.coordinate to:((CLLocation *)bookmark.coordinates).coordinate];
     NSInteger numberOfSteps = routes.count;
@@ -354,6 +372,8 @@
     region.span.latitudeDelta  = ((maxLat - minLat)<0.0)?100.0:(maxLat - minLat);
     region.span.longitudeDelta = ((maxLon - minLon)<0.0)?100.0:(maxLon - minLon);
     [self.mapView setRegion:region animated:YES];
+    self.fetchedResultsController = nil;
+    [self updateMapAnnotations];
 }
 
 - (IBAction)tapOnRouteButton:(id)sender {
@@ -361,6 +381,8 @@
         [self.routeButton setTitle:@"Route"];
         self.routingMode = !self.routingMode;
         [self clearRoute];
+        self.fetchedResultsController = nil;
+        [self updateMapAnnotations];
     } else {
         [self performSegueWithIdentifier:@"bookmarkListSegueIdentifier" sender:self];
     }

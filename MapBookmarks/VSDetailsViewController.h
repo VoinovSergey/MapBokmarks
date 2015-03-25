@@ -17,4 +17,6 @@
 
 @property (retain, nonatomic) SAMHUDView* progressIndicator;
 
+- (IBAction)tapOnTrashButton:(id)sender;
+
 @end

@@ -11,6 +11,7 @@
 #import "AFNetworking.h"
 #import "AFHTTPRequestOperationManager.h"
 #import <MapKit/MapKit.h>
+#import "AppDelegate.h"
 
 @implementation VSDetailsViewController
 
@@ -118,6 +119,47 @@
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         NSLog(@"Error: %@", error);
     }];
+}
+
+- (IBAction)tapOnTrashButton:(id)sender {
+    [self showAlert];
+}
+
+- (void)showAlert {
+    UIAlertController *alertController = [UIAlertController
+                                          alertControllerWithTitle:@"Attention."
+                                          message:@"Please confirm removing a bookmark"
+                                          preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *resetAction = [UIAlertAction
+                                  actionWithTitle:@"Delete"
+                                  style:UIAlertActionStyleDestructive
+                                  handler:^(UIAlertAction *action)
+                                  {
+                                      NSLog(@"Reset action");
+                                      // Delete NSManagedObject
+                                      NSManagedObjectContext * context = [((AppDelegate *)[[UIApplication sharedApplication] delegate]) managedObjectContext];
+                                      [context deleteObject:self.bookmark];
+                                      
+                                      // Save
+                                      NSError *error;
+                                      if ([context save:&error] == NO) {
+                                          // Handle Error.
+                                      }
+
+                                      [self.navigationController popViewControllerAnimated:YES];
+                                  }];
+    UIAlertAction *cancelAction = [UIAlertAction
+                                   actionWithTitle:@"Cancel"
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction *action)
+                                   {
+                                       NSLog(@"Cancel action");
+                                   }];
+    
+    [alertController addAction:resetAction];
+    [alertController addAction:cancelAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 @end
