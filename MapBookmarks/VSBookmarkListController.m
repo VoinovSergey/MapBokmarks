@@ -174,10 +174,7 @@
     [self.managedObjectContext deleteObject:object];
     
     // Save
-    NSError *error;
-    if ([self.managedObjectContext save:&error] == NO) {
-        // Handle Error.
-    }
+    [((AppDelegate *)[[UIApplication sharedApplication] delegate]) saveContext];
 }
 
 @end

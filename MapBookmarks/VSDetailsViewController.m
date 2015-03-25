@@ -125,11 +125,7 @@
                                       NSManagedObjectContext * context = [((AppDelegate *)[[UIApplication sharedApplication] delegate]) managedObjectContext];
                                       [context deleteObject:self.bookmark];
                                       
-                                      // Save
-                                      NSError *error;
-                                      if ([context save:&error] == NO) {
-                                          // Handle Error.
-                                      }
+                                      [((AppDelegate *)[[UIApplication sharedApplication] delegate]) saveContext];
                                       
                                       [self.navigationController popViewControllerAnimated:YES];
                                   }];

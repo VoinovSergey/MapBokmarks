@@ -27,8 +27,7 @@
     if ([self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
         [self.locationManager requestWhenInUseAuthorization];
     }
-    self.mapView.showsUserLocation = TRUE;
-    // Do any additional setup after loading the view, typically from a nib.
+    [self.fetchedResultsController performFetch:nil];
     [self setupGestureRecognaizer];
 }
 
@@ -41,11 +40,15 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark Location Manager delegate methods
+
 - (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation {
     self.mapView.centerCoordinate = userLocation.location.coordinate;
+    if (self.routingMode) {
+        [self.mapView removeOverlay:self.route];
+        [self goToRouteModeWithBookmark:self.selectedBookmark];
+    }
 }
-
-
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
     NSLog(@"User location error = %@", error);
@@ -53,11 +56,44 @@
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
     NSLog(@"Location manager updated status to %i", status);
+    if (status == kCLAuthorizationStatusAuthorizedWhenInUse || status == kCLAuthorizationStatusAuthorizedAlways) {
+        self.mapView.showsUserLocation = TRUE;
+        // Move map center to user location
+        MKCoordinateRegion region;
+        MKCoordinateSpan span;
+        span.latitudeDelta = 0.1f;
+        span.longitudeDelta = 0.1f;
+        region.span = span;
+        region.center = self.mapView.userLocation.coordinate;
+        [self.mapView setRegion:region animated:YES];
+        [self.mapView regionThatFits:region];
+    } else {
+        [self showAlert];
+    }
+    [self updateMapAnnotations];
 }
 
-- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
-{
-    // TODO: update route in routing mode
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
+    
+}
+
+#pragma mark Alert
+
+- (void)showAlert {
+    UIAlertController *alertController = [UIAlertController
+                                          alertControllerWithTitle:@"Location"
+                                          message:@"Please verify Privacy Location access for MapBookmarks app in settings"
+                                          preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction
+                                  actionWithTitle:@"Ok"
+                                  style:UIAlertActionStyleDefault
+                                  handler:^(UIAlertAction *action) {
+                                      NSLog(@"Dismiss alert");
+                                  }];
+    
+    [alertController addAction:okAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)setupGestureRecognaizer
@@ -69,61 +105,50 @@
 -(void)handleLongPressGesture:(UIGestureRecognizer*)sender
 {
     if (sender.state == UIGestureRecognizerStateEnded) {
-        CGPoint point = [sender locationInView:self.mapView];
-        CLLocationCoordinate2D coordinate = [self.mapView convertPoint:point toCoordinateFromView:self.mapView];
-        CLLocation * curLocation = [[CLLocation alloc] initWithLatitude:coordinate.latitude longitude:coordinate.longitude];
-        [self updateMapView:curLocation];
+        if (!self.routingMode) {
+            CGPoint point = [sender locationInView:self.mapView];
+            CLLocationCoordinate2D coordinate = [self.mapView convertPoint:point toCoordinateFromView:self.mapView];
+            CLLocation * curLocation = [[CLLocation alloc] initWithLatitude:coordinate.latitude longitude:coordinate.longitude];
+            [self addBookmarkOnMapView:curLocation];
+        }
     }
 }
 
-- (void)updateMapView:(CLLocation *)location
+- (void)addBookmarkOnMapView:(CLLocation *)location
 {
+    // Insert Bookmark object into current context. FetchedResultsController callback will create annotation view for it. Ensure that self.fetchedResultsController is not nil
+    if (self.fetchedResultsController == nil) {
+        NSLog(@"Error of fetchedResultsController initializing");
+    }
+    NSManagedObject *newBookmark = [NSEntityDescription
+                                    insertNewObjectForEntityForName:@"VSBookmark"
+                                    inManagedObjectContext:self.managedObjectContext];
+    ((VSBookmark *)newBookmark).coordinates = location;
+    ((VSBookmark *)newBookmark).named = NO;
+    ((VSBookmark *)newBookmark).title = @"Unnamed";
+    [((AppDelegate *)[[UIApplication sharedApplication] delegate]) saveContext];
+    
+    // Move map center to a new bookmark
     MKCoordinateRegion region;
     MKCoordinateSpan span;
     span.latitudeDelta = 0.01f;
     span.longitudeDelta = 0.01f;
-    
-    CLLocationCoordinate2D coordinate = location.coordinate;
-    
     region.span = span;
-    region.center = coordinate;
-    
-    NSManagedObjectContext * context = [((AppDelegate *)[[UIApplication sharedApplication] delegate]) managedObjectContext];
-    NSManagedObject *newBookmark = [NSEntityDescription
-                                    insertNewObjectForEntityForName:@"VSBookmark"
-                                    inManagedObjectContext:context];
-    ((VSBookmark *)newBookmark).coordinates = location;
-    ((VSBookmark *)newBookmark).named = NO;
-    ((VSBookmark *)newBookmark).title = @"Unnamed";
-    
+    region.center = location.coordinate;
     [self.mapView setRegion:region animated:YES];
     [self.mapView regionThatFits:region];
 }
 
 - (void)updateMapAnnotations {
     [self.fetchedResultsController performFetch:nil];
-
-    NSObject<NSFetchedResultsSectionInfo> * bookmarks = [[self.fetchedResultsController sections] objectAtIndex:0];
-    NSArray * annotations = [self generateAnnotationsFromBookmarks:bookmarks.objects];
+    NSArray * bookmarks = self.fetchedResultsController.fetchedObjects;
+    NSArray * annotations = [self generateAnnotationsFromBookmarks:bookmarks];
     [self.mapView removeAnnotations:self.mapView.annotations];
     [self.mapView addAnnotations:annotations];
-    
-    MKCoordinateRegion region;
-    MKCoordinateSpan span;
-    span.latitudeDelta = 0.1f;
-    span.longitudeDelta = 0.1f;
-    
-    CLLocationCoordinate2D coordinate = self.mapView.userLocation.coordinate;
-    
-    region.span = span;
-    region.center = coordinate;
-    
-    [self.mapView setRegion:region animated:YES];
-    [self.mapView regionThatFits:region];
 }
 
 - (void)addAnnotationForBookmark:(VSBookmark *)bookmark {
-    [self.managedObjectContext save:nil];
+    [((AppDelegate *)[[UIApplication sharedApplication] delegate]) saveContext];
     VSMapAnnotation * annotation = [[VSMapAnnotation alloc] initWithCoordinate:((CLLocation *)bookmark.coordinates).coordinate andBookmarkID:bookmark.objectID];
     annotation.title = ((VSBookmark *)bookmark).title;
     
@@ -152,6 +177,8 @@
     }
     return [NSArray arrayWithArray:annotations];
 }
+
+# pragma mark Annotation View
 
 - (MKAnnotationView *) mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation
 {
@@ -196,8 +223,15 @@
     {
         CLLocationCoordinate2D coordinate = annotationView.annotation.coordinate;
         CLLocation * curLocation = [[CLLocation alloc] initWithLatitude:coordinate.latitude longitude:coordinate.longitude];
-        // TODO: save new coordinate to appropriative bookmark
-        NSLog(@"%@", curLocation);
+        NSManagedObjectID * bookmarkID = ((VSMapAnnotation * )annotationView.annotation).bookmarkID;
+        VSBookmark * bookmark = (VSBookmark *)[self.managedObjectContext existingObjectWithID:bookmarkID
+                                                                                        error:nil];
+        bookmark.coordinates = curLocation;
+        [((AppDelegate *)[[UIApplication sharedApplication] delegate]) saveContext];
+        if (self.routingMode) {
+            [self.mapView removeOverlay:self.route];
+            [self goToRouteModeWithBookmark:self.selectedBookmark];
+        }
     }
 }
 
@@ -216,11 +250,11 @@
 }
 
 - (void)mapViewDidFinishLoadingMap:(MKMapView *)mapView {
-    [self updateMapAnnotations];
+    
 }
 
 - (void)openDetailsScreen:(VSBookmark *)bookmark {
-    [self.managedObjectContext save:nil];
+    [((AppDelegate *)[[UIApplication sharedApplication] delegate]) saveContext];
     
     self.selectedBookmark = (VSBookmark *)bookmark;
     
@@ -311,7 +345,7 @@
             break;
             
         case NSFetchedResultsChangeUpdate:
-            [self updateMapAnnotations];
+            //[self updateMapAnnotations];
             break;
             
         case NSFetchedResultsChangeMove:
@@ -338,6 +372,8 @@
     [self.mapView setRegion:region animated:YES];
     [self.mapView regionThatFits:region];
 }
+
+#pragma mark - Build route
 
 - (void)goToRouteModeWithBookmark:(VSBookmark *)bookmark {
     self.routingMode = YES;
