@@ -16,7 +16,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Skd-0M-hQX">
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" mapType="standard" showsUserLocation="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Skd-0M-hQX">
                                 <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                                 <connections>
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="orr-6h-PKu"/>
@@ -33,7 +33,7 @@
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Bookmarks" id="nj0-Xh-CFY">
                             <connections>
-                                <segue destination="Svv-RX-7hE" kind="show" id="Vpm-Lv-KcM"/>
+                                <segue destination="Svv-RX-7hE" kind="show" identifier="bookmarkListPushSegueIdentifier" id="Vpm-Lv-KcM"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

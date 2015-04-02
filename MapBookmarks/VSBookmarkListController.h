@@ -12,13 +12,9 @@
 
 @interface VSBookmarkListController : UITableViewController<NSFetchedResultsControllerDelegate>
 
-@property (nonatomic,strong) NSManagedObjectContext* managedObjectContext;
-@property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
-
+@property (copy) void (^selectionCellBlock)(VSBookmark *);
 @property (nonatomic, strong) IBOutlet UIBarButtonItem * editButton;
 
 - (IBAction)toogleEditMode:(id)sender;
-
-@property (copy)void (^selectionCellBlock)(VSBookmark *);
 
 @end

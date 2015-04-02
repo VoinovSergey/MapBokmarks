@@ -20,6 +20,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self updateTitle];
     if (self.bookmark.named) {
         self.tableView.separatorColor = [UIColor clearColor];
     } else {
@@ -27,20 +28,27 @@
     }
 }
 
+- (void)updateTitle {
+    self.title = [NSString stringWithFormat:@"Details: %@", self.bookmark.title];
+}
+
 #pragma mark Table methods
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     self.bookmark.named = YES;
     self.bookmark.title = self.placeArray[indexPath.row];
+    [self updateTitle];
     self.tableView.separatorColor = [UIColor clearColor];
     [self.tableView reloadData];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (self.bookmark.named) {
+        // for named bookmark we don't need any places
         return 0;
     }
     if ([self.placeArray count] == 0) {
+        // only 1 cell with "No results found" label
         return 1;
     }
     return [self.placeArray count];
@@ -91,19 +99,20 @@
 }
 
 - (IBAction)tapOnBuildRouteButton:(id)sender {
-    NSLog(@"Build route");
     [self.delegate goToRouteModeWithBookmark:self.bookmark];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (IBAction)tapOnCenterInMapButton:(id)sender {
-    NSLog(@"Center in map");
     [self.delegate centerInMapBookmark:self.bookmark];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)makeUnnamedAndShowPlaces {
     self.bookmark.named = NO;
+    self.bookmark.title = @"Unnamed";
+    [self updateTitle];
+    [((AppDelegate *)[[UIApplication sharedApplication] delegate]) saveContext];
     self.tableView.separatorColor = [UIColor lightGrayColor];
     [self retriveLocationDescriptionForCoordinate:((CLLocation *)self.bookmark.coordinates).coordinate];
 }
@@ -139,7 +148,7 @@
     [alertController addAction:resetAction];
     [alertController addAction:cancelAction];
     
-    [self presentViewController:alertController animated:YES completion:nil];
+    [self.navigationController presentViewController:alertController animated:YES completion:nil];
 }
 
 # pragma mark Get places using API

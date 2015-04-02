@@ -11,38 +11,14 @@
 #import "VSBookmark.h"
 #import "AppDelegate.h"
 
-@implementation VSBookmarkListController
+@interface VSBookmarkListController()
 
-- (NSFetchedResultsController *)fetchedResultsController {
-    
-    if (_fetchedResultsController != nil) {
-        return _fetchedResultsController;
-    }
-    
-    self.managedObjectContext = [((AppDelegate *)[[UIApplication sharedApplication] delegate]) managedObjectContext];
-    
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    NSEntityDescription *entity = [NSEntityDescription
-                                   entityForName:@"VSBookmark" inManagedObjectContext:self.managedObjectContext];
-    [fetchRequest setEntity:entity];
-    
-    NSSortDescriptor *sort = [[NSSortDescriptor alloc]
-                              initWithKey:@"title" ascending:NO];
-    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sort]];
-    
-    [fetchRequest setFetchBatchSize:20];
-    
-    [NSFetchedResultsController deleteCacheWithName:@"Root"];
-    
-    NSFetchedResultsController *theFetchedResultsController =
-    [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-                                        managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil
-                                                   cacheName:@"Root"];
-    self.fetchedResultsController = theFetchedResultsController;
-    _fetchedResultsController.delegate = self;
-    
-    return _fetchedResultsController;
-}
+@property (nonatomic, strong) NSManagedObjectContext* managedObjectContext;
+@property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
+
+@end
+
+@implementation VSBookmarkListController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -56,6 +32,22 @@
     
     self.title = @"Bookmarks";
 }
+
+- (IBAction)toogleEditMode:(id)sender {
+    self.tableView.editing = !self.tableView.editing;
+    
+    const UIBarButtonSystemItem systemItem = self.tableView.editing ? UIBarButtonSystemItemDone :UIBarButtonSystemItemEdit;
+    
+    UIBarButtonItem *const newButton =
+    [[UIBarButtonItem alloc]
+     initWithBarButtonSystemItem: systemItem
+     target: self
+     action: @selector(toogleEditMode:)];
+    
+    [self.navigationItem setRightBarButtonItems: @[newButton] animated: YES];
+}
+
+#pragma mark - TableView delegate
 
 - (NSInteger)tableView:(UITableView *)tableView
  numberOfRowsInSection:(NSInteger)section {
@@ -86,6 +78,18 @@
     return YES;
 }
 
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    // Delete NSManagedObject
+    NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
+    [self.managedObjectContext deleteObject:object];
+    
+    // Save
+    NSError *error = nil;
+    if ([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:&error]) {
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+    }
+}
+
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.presentingViewController != nil) {
         DECLARE_WEAK_SELF;
@@ -95,8 +99,46 @@
                 weak_self.selectionCellBlock(bookmark);
             }
         }];
-        
+    } else {
+        [self.navigationController popViewControllerAnimated:YES];
+        if (self.selectionCellBlock != nil) {
+            VSBookmark * bookmark = [self.fetchedResultsController objectAtIndexPath:indexPath];
+            self.selectionCellBlock(bookmark);
+        }
     }
+}
+
+#pragma mark - NSFetchedResultsController
+
+- (NSFetchedResultsController *)fetchedResultsController {
+    
+    if (_fetchedResultsController != nil) {
+        return _fetchedResultsController;
+    }
+    
+    self.managedObjectContext = [((AppDelegate *)[[UIApplication sharedApplication] delegate]) managedObjectContext];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"VSBookmark" inManagedObjectContext:self.managedObjectContext];
+    [fetchRequest setEntity:entity];
+    
+    NSSortDescriptor *sort = [[NSSortDescriptor alloc]
+                              initWithKey:@"title" ascending:NO];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sort]];
+    
+    [fetchRequest setFetchBatchSize:20];
+    
+    [NSFetchedResultsController deleteCacheWithName:@"Root"];
+    
+    NSFetchedResultsController *theFetchedResultsController =
+    [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
+                                        managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil
+                                                   cacheName:@"Root"];
+    self.fetchedResultsController = theFetchedResultsController;
+    _fetchedResultsController.delegate = self;
+    
+    return _fetchedResultsController;
 }
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
@@ -148,33 +190,9 @@
     }
 }
 
-
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
     // The fetch controller has sent all current change notifications, so tell the table view to process all updates.
     [self.tableView endUpdates];
-}
-
-- (IBAction)toogleEditMode:(id)sender {
-    self.tableView.editing = !self.tableView.editing;
-
-    const UIBarButtonSystemItem systemItem = self.tableView.editing ? UIBarButtonSystemItemDone :UIBarButtonSystemItemEdit;
-    
-    UIBarButtonItem *const newButton =
-    [[UIBarButtonItem alloc]
-     initWithBarButtonSystemItem: systemItem
-     target: self
-     action: @selector(toogleEditMode:)];
-    
-    [self.navigationItem setRightBarButtonItems: @[newButton] animated: YES];
-}
-
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Delete NSManagedObject
-    NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    [self.managedObjectContext deleteObject:object];
-    
-    // Save
-    [((AppDelegate *)[[UIApplication sharedApplication] delegate]) saveContext];
 }
 
 @end

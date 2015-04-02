@@ -22,15 +22,6 @@
 
 @property (nonatomic, strong) IBOutlet MKMapView * mapView;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem * routeButton;
-@property (nonatomic, strong) CLLocationManager *locationManager;
-
-@property (nonatomic, strong) VSBookmark * selectedBookmark;
-
-@property (nonatomic, strong) NSManagedObjectContext* managedObjectContext;
-@property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
-
-@property (nonatomic, assign) BOOL routingMode;
-@property (nonatomic, strong) MKPolyline * route;
 
 - (IBAction)tapOnRouteButton:(id)sender;
 
