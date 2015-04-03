@@ -21,6 +21,8 @@
 		B873A2CC1AC02E530083CDC4 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = B873A2CA1AC02E530083CDC4 /* LaunchScreen.xib */; };
 		B873A2D81AC02E530083CDC4 /* MapBookmarksTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B873A2D71AC02E530083CDC4 /* MapBookmarksTests.m */; };
 		B878E4B01AC2177900F26927 /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = B878E4AF1AC2177900F26927 /* RegexKitLite.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		B8A06E561ACE934C005C9DC3 /* FrankTestEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = B8A06E551ACE934C005C9DC3 /* FrankTestEnvironment.m */; };
+		B8A06E591ACEE2EC005C9DC3 /* UserBlueDot.png in Resources */ = {isa = PBXBuildFile; fileRef = B8A06E581ACEE2EC005C9DC3 /* UserBlueDot.png */; };
 		F66E1D85D8C04238B4725AA0 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E211950790B445899F55AC1 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -62,6 +64,9 @@
 		B873A2D71AC02E530083CDC4 /* MapBookmarksTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapBookmarksTests.m; sourceTree = "<group>"; };
 		B878E4AE1AC2177900F26927 /* RegexKitLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegexKitLite.h; sourceTree = "<group>"; };
 		B878E4AF1AC2177900F26927 /* RegexKitLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegexKitLite.m; sourceTree = "<group>"; };
+		B8A06E541ACE934C005C9DC3 /* FrankTestEnvironment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FrankTestEnvironment.h; path = Frank_helpers/FrankTestEnvironment.h; sourceTree = "<group>"; };
+		B8A06E551ACE934C005C9DC3 /* FrankTestEnvironment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FrankTestEnvironment.m; path = Frank_helpers/FrankTestEnvironment.m; sourceTree = "<group>"; };
+		B8A06E581ACEE2EC005C9DC3 /* UserBlueDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UserBlueDot.png; path = assets/UserBlueDot.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,7 +161,9 @@
 				B873A2C51AC02E530083CDC4 /* Main.storyboard */,
 				B83151B81AC2C94D008649CB /* Classes */,
 				B83151B71AC2C8E1008649CB /* XIBs */,
+				B8A06E531ACE92EE005C9DC3 /* Frank_helpers */,
 				B83151B61AC2C8B5008649CB /* RegexKitLite */,
+				B8A06E571ACEE2D3005C9DC3 /* Assets */,
 				B873A2B81AC02E530083CDC4 /* Supporting Files */,
 				B873A2C81AC02E530083CDC4 /* Images.xcassets */,
 			);
@@ -187,6 +194,23 @@
 				B873A2D61AC02E530083CDC4 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		B8A06E531ACE92EE005C9DC3 /* Frank_helpers */ = {
+			isa = PBXGroup;
+			children = (
+				B8A06E541ACE934C005C9DC3 /* FrankTestEnvironment.h */,
+				B8A06E551ACE934C005C9DC3 /* FrankTestEnvironment.m */,
+			);
+			name = Frank_helpers;
+			sourceTree = "<group>";
+		};
+		B8A06E571ACEE2D3005C9DC3 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				B8A06E581ACEE2EC005C9DC3 /* UserBlueDot.png */,
+			);
+			name = Assets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -271,6 +295,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8A06E591ACEE2EC005C9DC3 /* UserBlueDot.png in Resources */,
 				B873A2C71AC02E530083CDC4 /* Main.storyboard in Resources */,
 				B873A2CC1AC02E530083CDC4 /* LaunchScreen.xib in Resources */,
 				B873A2C91AC02E530083CDC4 /* Images.xcassets in Resources */,
@@ -328,6 +353,7 @@
 				B84751761AC172BA00717D2D /* VSDetailsViewController.m in Sources */,
 				B84751731AC16C6000717D2D /* VSBookmark.m in Sources */,
 				B873A2BE1AC02E530083CDC4 /* AppDelegate.m in Sources */,
+				B8A06E561ACE934C005C9DC3 /* FrankTestEnvironment.m in Sources */,
 				B873A2BB1AC02E530083CDC4 /* main.m in Sources */,
 				B84751791AC19EA700717D2D /* VSBookmarkListController.m in Sources */,
 				B84751701AC0B4EB00717D2D /* VSMapAnnotation.m in Sources */,

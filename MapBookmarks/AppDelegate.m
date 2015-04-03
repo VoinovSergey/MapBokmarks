@@ -7,6 +7,9 @@
 //
 
 #import "AppDelegate.h"
+#import <CoreLocation/CoreLocation.h>
+#import <MapKit/MapKit.h>
+#import "FrankTestEnvironment.h"
 
 @interface AppDelegate ()
 
@@ -17,6 +20,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    [FrankTestEnvironment bypassAcknowledgeLocationServiceWithClass:[CLLocationManager class]];
+    [FrankTestEnvironment bypassAcknowledgeUserLocationWithClass:[MKUserLocation class]];
     return YES;
 }
 

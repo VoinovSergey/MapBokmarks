@@ -1,9 +1,19 @@
 Feature: 
-  As an iOS developer
-  I want to have a sample feature file
-  So I can see what my next step is in the wonderful world of Frank/Cucumber testing
+  Open the app and initaial tests
 
-Scenario: 
-  Rotating the simulator for demonstration purposes
-Given I launch the app
-  And I tap Ok on location grant alert
+Scenario: Bookmarks open
+  Given I launch the app using iOS 8.2 and the ipad simulator
+  When I touch "Bookmarks"
+  Then I see Bookmarks list
+
+Scenario: Long tap
+  Given I launch the app using iOS 8.2 and the ipad simulator
+	When I made long tap on map
+	Then I see a bookmark pin added
+
+Scenario: Route to bookmark
+  Given I launch the app using iOS 8.2 and the ipad simulator
+	When I made long tap on map
+	Then I see a bookmark pin added
+	When I touch "Route"
+	  And I tap on first bookmark in popup

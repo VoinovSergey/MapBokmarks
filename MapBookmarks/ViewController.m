@@ -236,6 +236,11 @@
     NSArray * annotations = [self generateAnnotationsFromBookmarks:bookmarks];
     [self.mapView removeAnnotations:self.mapView.annotations];
     [self.mapView addAnnotations:annotations];
+#if defined(FRANKIFIED)
+    VSMapAnnotation * annotation = [[VSMapAnnotation alloc] initWithCoordinate:self.mapView.userLocation.location.coordinate andBookmarkID:0];
+    annotation.title = nil;
+    [self.mapView addAnnotation:annotation];
+#endif
 }
 
 - (void)addAnnotationForBookmark:(VSBookmark *)bookmark {
@@ -322,6 +327,13 @@
     if ([annotation isMemberOfClass:[MKUserLocation class]]) {
         return nil;
     }
+#if defined(FRANKIFIED)
+    if ( ((VSMapAnnotation *) annotation).bookmarkID == 0 ) {
+        MKAnnotationView * annotationView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"user"];
+        annotationView.image = [UIImage imageNamed:@"UserBlueDot"];
+        return annotationView;
+    }
+#endif
     MKPinAnnotationView *annotationView = (MKPinAnnotationView *)[self.mapView dequeueReusableAnnotationViewWithIdentifier:@"currentlocation"];
     if (annotationView == nil) {
         annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"currentlocation"];
