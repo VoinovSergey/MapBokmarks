@@ -72,11 +72,8 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <PathRunnable
-         runnableDebuggingMode = "0"
-         FilePath = "/Users/voinov/Documents/Projects/MapBookmarks/Frank/frankified_build/Frankified.app">
-      </PathRunnable>
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B873A2B41AC02E530083CDC4"
@@ -84,7 +81,7 @@
             BlueprintName = "MapBookmarks"
             ReferencedContainer = "container:MapBookmarks.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
       <LocationScenarioReference
