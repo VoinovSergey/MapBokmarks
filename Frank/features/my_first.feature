@@ -2,7 +2,7 @@ Feature:
   Open the app and initaial tests
 
 Scenario: Bookmarks open
-  Given I launch the app using iOS 7.1 and the iphone simulator
+  Given I launch the app using iOS 8.1 and the iphone simulator
   When I touch "Bookmarks"
   Then I see Bookmarks list
 
