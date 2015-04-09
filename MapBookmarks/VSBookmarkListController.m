@@ -91,16 +91,31 @@
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.presentingViewController != nil) {
-        DECLARE_WEAK_SELF;
-        [self dismissViewControllerAnimated:YES completion:^{
-            if (weak_self.selectionCellBlock != nil) {
+    // Determinate if it's a popover or viewcontroller in navigationcontroller and dismiss/pop
+    if (self.navigationController == nil) {
+        // For iOS 7 we need to obtain UIPopoverController instance and call method - dismissPopoverAnimated
+        // For iOS 8 simple to call - dismissViewControllerAnimated
+        if (self.presentingViewController == nil) {
+            UIPopoverController *popopverController = [self performSelector:@selector(_popoverController)];
+            [popopverController dismissPopoverAnimated:NO];
+            // do selection block after dismiss
+            if (self.selectionCellBlock != nil) {
                 VSBookmark * bookmark = [self.fetchedResultsController objectAtIndexPath:indexPath];
-                weak_self.selectionCellBlock(bookmark);
+                self.selectionCellBlock(bookmark);
             }
-        }];
+        } else {
+            DECLARE_WEAK_SELF;
+            [self dismissViewControllerAnimated:YES completion:^{
+                // do selection block after dismiss
+                if (weak_self.selectionCellBlock != nil) {
+                    VSBookmark * bookmark = [self.fetchedResultsController objectAtIndexPath:indexPath];
+                    weak_self.selectionCellBlock(bookmark);
+                }
+            }];
+        }
     } else {
-        [self.navigationController popViewControllerAnimated:YES];
+        [self.navigationController popViewControllerAnimated:NO];
+        // do selection block after dismiss
         if (self.selectionCellBlock != nil) {
             VSBookmark * bookmark = [self.fetchedResultsController objectAtIndexPath:indexPath];
             self.selectionCellBlock(bookmark);

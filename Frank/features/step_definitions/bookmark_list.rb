@@ -11,3 +11,11 @@ When (/^I tap on first bookmark in popup$/) {
   touch(cell_selector)
   wait_for_nothing_to_be_animating()
 }
+
+Then (/^I see a route on map$/) {
+	map_selector = "view:'MKMapView'"
+	wait_until_with_buffer(timeout: 10.seconds, message: "Unexpected number of overlays on map. (#{overlays.count}, exp 1)") {
+      overlays = frankly_map(map_selector, 'allOverlaysOnMap')[0]
+      overlays.count == 1
+  	}
+}
