@@ -19,3 +19,11 @@ Then (/^I see a route on map$/) {
       overlays && overlays.count == 1
   	}
 }
+
+Then (/^I see no routes on map$/) {
+	map_selector = "view:'MKMapView'"
+	wait_until_with_buffer(timeout: 10, message: "Unexpected number of overlays on map. Expected 0)") {
+      overlays = frankly_map(map_selector, 'allOverlaysOnMap')[0]
+      overlays && overlays.count == 0
+  	}
+}
